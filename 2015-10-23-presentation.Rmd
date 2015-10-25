@@ -1,0 +1,139 @@
+---
+title: "bcs"
+author: "Giacomo"
+date: "23 Oct 2015"
+output: ioslides_presentation
+runtime: shiny 
+---
+
+```{r, echo=FALSE}
+library(ggplot2)
+library(RColorBrewer)
+library(shiny)
+library(dplyr)
+kol = brewer.pal(12, 'Set3')
+seqD1 = read.csv('data/seqD1.csv')
+seqDay5 = read.csv('data/seqDay5.csv')
+```
+
+
+## R Markdown
+
+This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+
+## Slide with Bullets
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Slide with R Code and Output
+
+```{r, echo = FALSE}
+shinyApp(
+  
+  ui = fluidPage(
+    selectInput("region", "Region:", 
+                choices = colnames(WorldPhones)),
+    plotOutput("phonePlot")
+  ),
+  
+  server = function(input, output) {
+    output$phonePlot <- renderPlot({
+      barplot(WorldPhones[,input$region]*1000, 
+              ylab = "Number of Telephones", xlab = "Year")
+    })
+  },
+  
+  options = list(height = 500)
+)
+
+```
+
+## Slide with R Code and Output
+
+<iframe width="600" height="371" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/1oVralALYTKKIXmAo3TCdz039nN_aNeeAPAJl_2EqXng/pubchart?oid=1691385512&amp;format=interactive"></iframe>
+
+## Slide with R Code and Output
+
+```{r, echo=FALSE}
+shinyApp(
+  ui = fluidPage(
+    sliderInput("time",
+                "Choose the time of the day",
+                min = 1,
+                max = 1440,
+                value = c(1,1440)),
+    plotOutput("sequence")
+  ),
+  
+  server = function(input, output) {
+    output$sequence <- renderPlot({
+      x = seq(from = min(input$time), to = max(input$time), by = 1)
+      p = ggplot( seqD1[seqD1$Time %in% c(x), ] , aes(x = Time, fill = factor(av), y = SharePerHour)) + geom_bar(stat = "identity", width = 1) + scale_fill_manual(values=kol) + theme_minimal()
+      print(p)
+    })
+  }, 
+  options = list(height = 1000)
+)
+```
+
+
+
+## Slide with R Code and Output
+
+```{r, echo=FALSE}
+shinyApp(
+  ui = fluidPage(
+    sliderInput("timescale",
+                "Choose the time of the day",
+                min = 480,
+                max = 1440,
+                step = 10, 
+                animate = animationOptions(interval=400, loop=TRUE), 
+                value = 1),  
+    plotOutput("sequence")), 
+  
+  server = function(input, output) {
+    output$sequence <- renderPlot({
+      ggplot( seqD1[seqD1$Time %in% c(input$timescale), ] , aes(x = av, fill = factor(av), y = SharePerHour)) + geom_bar(stat="identity") + scale_fill_manual(values=kol) + theme_minimal() + ylim(0,50) + scale_x_discrete(drop=FALSE) 
+    })
+  }, 
+  options = list(height = 1000)
+)
+```
+
+## ff
+
+<iframe src="timefriday.html"></iframe>
+
+## ff
+
+```{r, echo=FALSE}
+
+shinyApp(
+  ui = fluidPage(
+    sliderInput("time",
+                "Choose the time of the day",
+                min = 1,
+                max = 1440,
+                value = c(1,1440)),
+    plotOutput("sequence")
+  ),
+  
+  server = function(input, output) {
+    output$sequence <- renderPlot({
+      x = seq(from = min(input$time), to = max(input$time), by = 1)
+      p = ggplot( seqD1[seqD1$Time %in% c(x), ] , aes(x = Time, fill = factor(av), y = SharePerHour)) + geom_bar(stat = "identity", width = 1) + scale_fill_manual(values=kol) + theme_minimal()
+      print(p)
+    })
+  }, 
+  options = list(height = 1000)
+)
+
+```
+
+
+

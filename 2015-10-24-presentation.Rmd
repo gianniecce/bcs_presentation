@@ -1,0 +1,45 @@
+---
+title: "British Cohort Study - 1986 Time Use diaries"
+author: "Giacomo Vagni (PRS)"
+date: "23 Oct 2015"
+output: ioslides_presentation
+runtime: shiny 
+---
+
+## BCS 
+```{r, echo=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+library(ggplot2)
+library(RColorBrewer)
+library(shiny)
+library(dplyr)
+kol = brewer.pal(12, 'Set3')
+seqD1 = read.csv('data/seqD1.csv')
+seqDay5 = read.csv('data/seqDay5.csv')
+```
+
+## Day Sequences 
+
+```{r, echo=FALSE}
+shinyApp(
+  ui = fluidPage(
+    sliderInput("time",
+                "Choose the time of the day",
+                min = 1,
+                max = 1440,
+                value = c(1,1440)),
+    selectInput("day", "days:", choices = levels(factor(seqDay5$diaryday)) ),
+    plotOutput("sequence")
+  ),
+  
+  server = function(input, output) {
+    output$sequence <- renderPlot({
+      x = seq(from = min(input$time), to = max(input$time), by = 1)
+      p = ggplot( filter(seqDay5, diaryday == input$day)[seqDay5$Time %in% c(x), ] , aes(x = Time, fill = factor(av), y = SharePerHour)) + geom_bar(stat = "identity", width = 1) + scale_fill_manual(values=kol) + theme_minimal()
+      print(p)
+    })
+  }, 
+  options = list(height = 1000)
+)
+```
+
+
